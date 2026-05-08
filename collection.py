@@ -1,7 +1,8 @@
 import os
 import json
+import time
 from ultralytics import RTDETR
-
+from small_utils import get_cost_time
 def _inferecne(model:RTDETR,img_path):
     results = model.predict(img_path)
     r = results[0]
@@ -38,7 +39,10 @@ def main():
         os.path.join(imgs_dir, f)
         for f in os.listdir(imgs_dir)
         if os.path.isfile(os.path.join(imgs_dir, f))]
+    print(f"包含图像数量:{len(img_paths)}")
     for epoch in range(Epochs):
+        print(f"{epoch}/{Epochs}...")
+        e_start_timestamp = time.time()
         # 模型
         model = RTDETR(f"runs/detect/train/weights/epoch{epoch}.pt")
         predicted_box_dict = collect_one_epoch(model,img_paths)
@@ -50,11 +54,15 @@ def main():
         with open(save_json_path, "w", encoding="utf-8") as f:
             json.dump(predicted_box_dict, f, indent=4)
         print(f"数据保存在:{save_json_path}")
+        e_end_timestamp = time.time()
+        e_cost_timestamp = e_end_timestamp - e_start_timestamp
+        e_cost_time = get_cost_time(e_cost_timestamp)
+        print(f"该轮次耗时:{e_cost_time}")
 
 if __name__ == "__main__":
     exp_data_root = "/data/mml/data_debugging_data"
     dataset_name = "VisDrone"
     model_name = "rtdetr"
-    Epochs = 100
+    Epochs = 2
     collect_p_box_dir = os.path.join(exp_data_root,"collection_bbox_level",dataset_name,model_name,"predicted_bbox")
     main()
