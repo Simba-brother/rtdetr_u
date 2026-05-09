@@ -3,20 +3,23 @@ import json
 import time
 from ultralytics import RTDETR
 from small_utils import get_cost_time
+def _inferecne(model:RTDETR,img_path):
+    results = model.predict(img_path)
+    r = results[0]
+    xyxy_list = r.boxes.xyxy.tolist()
+    clsid_list = r.boxes.cls.tolist()
+    conf_list = r.boxes.conf.tolist()
+    return xyxy_list, clsid_list, conf_list
 
-def collect_one_epoch(model:RTDETR,imgs_dir):
-    results = model.predict(imgs_dir, stream=True, batch=128, device="cuda:0",verbose=False)
+def collect_one_epoch(model,img_paths):
     # 收集容器
     predicted_box_dict = {}
     predicted_box_id = 0
-    for r in results:
-        img_path = r.path
+    for img_path in img_paths:
         img_basename = img_path.split("/")[-1]
         predicted_box_dict[img_basename] = {}
         predicted_bboxs = []
-        xyxy_list = r.boxes.xyxy.tolist()
-        clsid_list = r.boxes.cls.tolist()
-        conf_list = r.boxes.conf.tolist()
+        xyxy_list,clsid_list,conf_list = _inferecne(model,img_path)
         bbox = {}
         for xyxy,clsid,conf in zip(xyxy_list,clsid_list,conf_list):
             bbox["predicted_cls"] = int(clsid)
@@ -32,13 +35,17 @@ def collect_one_epoch(model:RTDETR,imgs_dir):
 def main():
     # 所有的训练集图片路径
     imgs_dir = "/data/mml/data_debugging_data/datasets/VisDrone-yolo/origin/train/images"
+    img_paths = [
+        os.path.join(imgs_dir, f)
+        for f in os.listdir(imgs_dir)
+        if os.path.isfile(os.path.join(imgs_dir, f))]
+    print(f"包含图像数量:{len(img_paths)}")
     for epoch in range(Epochs):
         print(f"{epoch}/{Epochs}...")
         e_start_timestamp = time.time()
         # 模型
-        model = RTDETR(f"results/error_visDrone_train/weights/best.pt")
-        predicted_box_dict = collect_one_epoch(model,imgs_dir)
-        print(f"推理图像数量:{len(predicted_box_dict.keys())}")
+        model = RTDETR(f"runs/detect/train/weights/epoch{epoch}.pt")
+        predicted_box_dict = collect_one_epoch(model,img_paths)
         # 保存收集容器
         save_dir = collect_p_box_dir
         os.makedirs(save_dir,exist_ok=True)
