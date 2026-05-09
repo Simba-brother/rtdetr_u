@@ -33,10 +33,10 @@ def main():
     # 所有的训练集图片路径
     imgs_dir = "/data/mml/data_debugging_data/datasets/VisDrone-yolo/origin/train/images"
     for epoch in range(Epochs):
-        print(f"{epoch}/{Epochs}...")
+        print(f"Epoch:{epoch}/{Epochs}...")
         e_start_timestamp = time.time()
         # 模型
-        model = RTDETR(f"results/error_visDrone_train/weights/best.pt")
+        model = RTDETR(os.path.join(models_dir,f"epoch{epoch}.pt"))
         predicted_box_dict = collect_one_epoch(model,imgs_dir)
         print(f"推理图像数量:{len(predicted_box_dict.keys())}")
         # 保存收集容器
@@ -56,6 +56,7 @@ if __name__ == "__main__":
     exp_data_root = "/data/mml/data_debugging_data"
     dataset_name = "VisDrone"
     model_name = "rtdetr"
-    Epochs = 2
+    Epochs = 100
     collect_p_box_dir = os.path.join(exp_data_root,"collection_bbox_level",dataset_name,model_name,"predicted_bbox")
+    models_dir = "/data/mml/data_debugging_data/models/visdrone/rtdetr/train/weights"
     main()
