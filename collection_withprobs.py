@@ -8,7 +8,7 @@ from scipy.special import softmax as scipy_softmax
 
 
 def collect_one_epoch(model:RTDETR,imgs_dir):
-    results = model.predict(imgs_dir, stream=True, batch=256, device="cuda:0",verbose=False)
+    results = model.predict(imgs_dir, stream=True, batch=256, device=f"cuda:{gpu_id}",verbose=False)
     # 收集容器
     predicted_box_dict = {}
     predicted_box_id = 0
@@ -37,8 +37,6 @@ def collect_one_epoch(model:RTDETR,imgs_dir):
     return predicted_box_dict
 
 def main():
-    # 所有的训练集图片路径
-    imgs_dir = "/data/mml/data_debugging_data/datasets/VisDrone-yolo/origin/train/images"
     epoch = 99
     print(f"Epoch:{epoch}")
     e_start_timestamp = time.time()
@@ -61,9 +59,11 @@ def main():
 
 if __name__ == "__main__":
     exp_data_root = "/data/mml/data_debugging_data"
-    dataset_name = "VisDrone"
+    dataset_name = "KITTI_8" # VOC2012|KITTI_8|VisDrone
     model_name = "rtdetr"
+    gpu_id = 1
+    imgs_dir = f"{exp_data_root}/datasets/{dataset_name}-yolo/origin/train/images"
     collect_p_box_dir = os.path.join(exp_data_root,"collection_bbox_level",dataset_name,model_name,
                                      "other_baselines","predicted_bbox_withprobs")
-    models_dir = "/data/mml/data_debugging_data/models/visdrone/rtdetr/train/weights"
+    models_dir = f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/error/weights"
     main()

@@ -8,7 +8,7 @@
 
 origin_train: /data/mml/data_debugging_data/datasets/VOC2012-yolo/origin/train/images
 train: /data/mml/data_debugging_data/datasets/VOC2012-yolo/train/images
-val: /data/mml/data_debugging_data/datasets/VOC2012-yolo/val/images
+val: /data/mml/data_debugging_data/datasets/VOC2012-yolo/test/images
 test: /data/mml/data_debugging_data/datasets/VOC2012-yolo/test/images
 
 # number of classes

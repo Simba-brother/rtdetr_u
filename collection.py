@@ -5,7 +5,7 @@ from ultralytics import RTDETR
 from small_utils import get_cost_time
 
 def collect_one_epoch(model:RTDETR,imgs_dir):
-    results = model.predict(imgs_dir, stream=True, batch=256, device="cuda:0",verbose=False)
+    results = model.predict(imgs_dir, stream=True, batch=256, device=f"cuda:{gpu_id}",verbose=False)
     # 收集容器
     predicted_box_dict = {}
     predicted_box_id = 0
@@ -32,7 +32,6 @@ def collect_one_epoch(model:RTDETR,imgs_dir):
 
 def main():
     # 所有的训练集图片路径
-    imgs_dir = "/data/mml/data_debugging_data/datasets/VisDrone-yolo/origin/train/images"
     for epoch in range(Epochs):
         print(f"Epoch:{epoch}/{Epochs}...")
         e_start_timestamp = time.time()
@@ -55,9 +54,11 @@ def main():
 
 if __name__ == "__main__":
     exp_data_root = "/data/mml/data_debugging_data"
-    dataset_name = "KITTI_8" # VOC2012|KITTI_8|VisDrone
+    dataset_name = "VOC2012" # VOC2012|KITTI_8|VisDrone
     model_name = "rtdetr"
+    gpu_id = 1
     Epochs = 100
+    imgs_dir = f"/data/mml/data_debugging_data/datasets/{dataset_name}-yolo/origin/train/images"
     collect_p_box_dir = os.path.join(exp_data_root,"collection_bbox_level",dataset_name,model_name,"predicted_bbox")
     models_dir = f"/data/mml/data_debugging_data/models/{dataset_name.lower()}/rtdetr/error/weights"
     main()
