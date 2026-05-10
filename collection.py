@@ -55,9 +55,9 @@ def main():
 
 if __name__ == "__main__":
     exp_data_root = "/data/mml/data_debugging_data"
-    dataset_name = "VisDrone"
+    dataset_name = "KITTI_8" # VOC2012|KITTI_8|VisDrone
     model_name = "rtdetr"
     Epochs = 100
     collect_p_box_dir = os.path.join(exp_data_root,"collection_bbox_level",dataset_name,model_name,"predicted_bbox")
-    models_dir = "/data/mml/data_debugging_data/models/visdrone/rtdetr/train/weights"
+    models_dir = f"/data/mml/data_debugging_data/models/{dataset_name.lower()}/rtdetr/error/weights"
     main()
