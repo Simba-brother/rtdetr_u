@@ -1,9 +1,10 @@
 
 from ultralytics import RTDETR
-
-model = RTDETR("results/clean_visDrone_train/weights/best.pt")
-
+# from ultralytics.nn.modules.head
+# from ultralytics.models.rtdetr.predict
+model = RTDETR("/data/mml/data_debugging_data/models/visdrone/rtdetr/train/weights/epoch99.pt")
 img_path = "test_images/visdrone/0000006_00159_d_0000001.jpg"
+# img_path = "/data/mml/data_debugging_data/datasets/VisDrone-yolo/origin/train/images/0000002_00005_d_0000014.jpg"
 img_paths = []
 img_paths.append(img_path)
 results = model.predict([img_path])
