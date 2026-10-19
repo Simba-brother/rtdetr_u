@@ -53,12 +53,16 @@ def main():
         print(f"该轮次耗时:{e_cost_time}")
 
 if __name__ == "__main__":
-    exp_data_root = "/data/mml/data_debugging_data"
-    dataset_name = "VOC2012" # VOC2012|KITTI_8|VisDrone
+    exp_data_root = "/data/mml/data_debugging_data/ProAFL_data"
+    dataset_name = "voc" # voc|visdrone|kitti
     model_name = "rtdetr"
+    ts = int(time.time()) # 时间戳
+    repeat_id = 1
+    fault_rate = 0.1
     gpu_id = 1
     Epochs = 100
-    imgs_dir = f"/data/mml/data_debugging_data/datasets/{dataset_name}-yolo/origin/train/images"
-    collect_p_box_dir = os.path.join(exp_data_root,"collection_bbox_level",dataset_name,model_name,"predicted_bbox")
+    imgs_dir = f"{exp_data_root}/datasets/{dataset_name}-yolo/origin/train/images"
+    collect_p_box_dir = os.path.join(exp_data_root,"collection_process_info",dataset_name,model_name,"collected_predict_boxes",
+        f"inject_{fault_rate}_repeat", f"repeat_{repeat_id}_{ts}")
     models_dir = f"/data/mml/data_debugging_data/models/{dataset_name.lower()}/rtdetr/error/weights"
     main()

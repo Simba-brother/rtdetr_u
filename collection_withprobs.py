@@ -6,7 +6,6 @@ from ultralytics import RTDETR
 from small_utils import get_cost_time
 from scipy.special import softmax as scipy_softmax
 
-
 def collect_one_epoch(model:RTDETR,imgs_dir):
     results = model.predict(imgs_dir, stream=True, batch=256, device=f"cuda:{gpu_id}",verbose=False)
     # 收集容器
