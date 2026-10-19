@@ -1,4 +1,3 @@
-
 from ultralytics import RTDETR
 # from ultralytics.nn.modules.head
 # from ultralytics.models.rtdetr.predict

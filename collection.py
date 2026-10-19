@@ -17,14 +17,25 @@ def collect_one_epoch(model:RTDETR,imgs_dir):
         xyxy_list = r.boxes.xyxy.tolist()
         clsid_list = r.boxes.cls.tolist()
         conf_list = r.boxes.conf.tolist()
+        all_cls_scores = getattr(r, "all_cls_scores", None)
+        if all_cls_scores is None:
+            raise RuntimeError(
+                "推理结果缺少 all_cls_scores，请确认 RT-DETR 解码器和推理后处理"
+                "已启用全部类别概率输出（参考 collection_withprobs.py）。"
+            )
+        probs_list = all_cls_scores.tolist()
+        if len(probs_list) != len(xyxy_list):
+            raise ValueError(f"{img_basename}: 类别概率数量与预测框数量不一致")
         
-        for xyxy,clsid,conf in zip(xyxy_list,clsid_list,conf_list):
+        for xyxy,clsid,conf,probs in zip(xyxy_list,clsid_list,conf_list,probs_list):
             bbox = {}
-            bbox["predicted_cls"] = int(clsid)
-            bbox["bbox"] = xyxy
-            bbox["conf"] = conf
-            bbox["img_name"] = img_basename
             bbox["predicted_box_id"] = predicted_box_id
+            bbox["img_name"] = img_basename
+            bbox["predicted_cls"] = int(clsid)
+            bbox["conf"] = round(conf, 4)
+            bbox["bbox"] = xyxy
+            # 与样例一致：保留原始 sigmoid 概率，不做 softmax。
+            bbox["probs"] = [round(prob, 4) for prob in probs]
             predicted_box_id += 1
             predicted_bboxs.append(bbox)
         predicted_box_dict[img_basename]["predicted_bboxs"] = predicted_bboxs
@@ -64,5 +75,5 @@ if __name__ == "__main__":
     imgs_dir = f"{exp_data_root}/datasets/{dataset_name}-yolo/origin/train/images"
     collect_p_box_dir = os.path.join(exp_data_root,"collection_process_info",dataset_name,model_name,"collected_predict_boxes",
         f"inject_{fault_rate}_repeat", f"repeat_{repeat_id}_{ts}")
-    models_dir = f"/data/mml/data_debugging_data/models/{dataset_name.lower()}/rtdetr/error/weights"
+    models_dir = f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/fault_train/{fault_rate}/repeat_{repeat_id}/weights"
     main()
