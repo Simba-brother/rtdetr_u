@@ -29,3 +29,8 @@ def label_replace(dataset_name,train_labels_dir,val_labels_dir):
     shutil.copytree(val_labels_dir, cur_val_labels_dir)
     print("Training label directory replacement completed")
     print("Validation label directory replacement completed")
+    for labels_dir in (cur_train_labels_dir, cur_val_labels_dir):
+        cache_path = labels_dir + ".cache"
+        if os.path.exists(cache_path):
+            os.remove(cache_path)
+            print(f"已删除标签缓存: {cache_path}")

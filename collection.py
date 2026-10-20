@@ -5,8 +5,7 @@ from ultralytics import RTDETR
 from small_utils import get_cost_time
 
 def collect_one_epoch(model:RTDETR,imgs_dir):
-    results = model.predict(imgs_dir, stream=True, batch=256, device=f"cuda:{gpu_id}",verbose=False)
-    # 收集容器
+    results = model.predict(imgs_dir, stream=True, batch=256, conf=0.1, device=f"cuda:{gpu_id}",verbose=False) # visdrone:conf=0.1,voc/kitti:conf=0.25(default)
     predicted_box_dict = {}
     predicted_box_id = 0
     for r in results:
@@ -65,7 +64,7 @@ def main():
 
 if __name__ == "__main__":
     exp_data_root = "/data/mml/data_debugging_data/ProAFL_data"
-    dataset_name = "voc" # voc|visdrone|kitti
+    dataset_name = "visdrone" # voc|visdrone|kitti
     model_name = "rtdetr"
     ts = int(time.time()) # 时间戳
     repeat_id = 1
