@@ -17,4 +17,4 @@ results = model.train(data=f"data/{dataset_name}.yaml",epochs=100,imgsz=640,batc
                       project=f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/fault_train/{inject_ratio}",
                       name=f"repeat_{repeat_id}",
                       exist_ok=True)
-# results = model.train(resume=True,project="/data/mml/data_debugging_data/models/visdrone/rtdetr",name="train")
+
