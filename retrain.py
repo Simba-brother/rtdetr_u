@@ -5,12 +5,17 @@ from pathlib import Path
 
 exp_data_root = Path("/data/mml/data_debugging_data/ProAFL_data")
 
-dataset_name = "voc" # voc|visdrone|kitti
+dataset_name = "visdrone" # voc|visdrone|kitti
 inject_ratio = 0.1
 repeat_id = 1
 
 method_name = "ours" # ours|datactive
 retrain_epoch = 25
+if dataset_name == "visdrone":
+    batch_size = 32
+else:
+    batch_size = 64
+
 resume_model_pt = exp_data_root / "models" / dataset_name.lower() / "rtdetr" / "fault_train" / str(inject_ratio) / f"repeat_{repeat_id}" / "weights" / "epoch49.pt"
 
 if method_name == "datactive":
@@ -28,7 +33,7 @@ model = RTDETR(resume_model_pt)
 label_replace(dataset_name,train_labels_dir,val_labels_dir)
 
 
-results = model.train(data=f"data/{dataset_name}.yaml",epochs=retrain_epoch,imgsz=640,batch=64,device=[0],
+results = model.train(data=f"data/{dataset_name}.yaml",epochs=retrain_epoch,imgsz=640,batch=batch_size,device=[1],
                       save_period=-1,
                       amp=False,
                       project=str(output_dir.parent),
@@ -39,4 +44,5 @@ results = model.train(data=f"data/{dataset_name}.yaml",epochs=retrain_epoch,imgs
 if model.trainer.last.exists():
     model.trainer.last.unlink()
     print(f"已删除 {model.trainer.last}，仅保留 best.pt: {model.trainer.best}")
+print(f"重训练模型保存在 {output_dir}")
 
