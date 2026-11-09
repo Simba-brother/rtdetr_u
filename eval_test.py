@@ -3,10 +3,10 @@ from ultralytics import RTDETR
 
 exp_data_root = Path("/data/mml/data_debugging_data/ProAFL_data")
 
-dataset_name = "voc" # voc|visdrone|kitti
+dataset_name = "kitti" # voc|kitti|visdrone
 inject_ratio = 0.1
 repeat_id = 1
-method_name = "datactive" # ours|datactive
+method_name = "loss" # ours|datactive|objectlab|deepgini|entropy|margin|loss
 
 # 与 retrain.py 的重训练输出目录保持一致
 model_path = exp_data_root / "retrained_models" / method_name / dataset_name / "rtdetr" / str(inject_ratio) / f"repeat_{repeat_id}" / "weights" / "best.pt"

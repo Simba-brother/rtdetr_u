@@ -5,11 +5,10 @@ from pathlib import Path
 
 exp_data_root = Path("/data/mml/data_debugging_data/ProAFL_data")
 
-dataset_name = "visdrone" # voc|visdrone|kitti
+dataset_name = "kitti" # voc|kitti|visdrone
 inject_ratio = 0.1
 repeat_id = 1
-
-method_name = "ours" # ours|datactive
+method_name = "loss" # ours|datactive|objectlab|deepgini|entropy|margin|loss
 retrain_epoch = 25
 if dataset_name == "visdrone":
     batch_size = 32
@@ -19,7 +18,7 @@ else:
 resume_model_pt = exp_data_root / "models" / dataset_name.lower() / "rtdetr" / "fault_train" / str(inject_ratio) / f"repeat_{repeat_id}" / "weights" / "epoch49.pt"
 
 if method_name == "datactive":
-    repair_root = exp_data_root / "repair" / "datactive" / "voc" / f"{inject_ratio}_repeat" / f"repeat_{repeat_id}" / "yolo_format"
+    repair_root = exp_data_root / "repair" / "datactive" / dataset_name / f"{inject_ratio}_repeat" / f"repeat_{repeat_id}" / "yolo_format"
 else:
     repair_root = exp_data_root / "repair" / method_name / dataset_name / "rtdetr" / f"{inject_ratio}_repeat" / f"repeat_{repeat_id}" / "yolo_format"
 
@@ -33,7 +32,7 @@ model = RTDETR(resume_model_pt)
 label_replace(dataset_name,train_labels_dir,val_labels_dir)
 
 
-results = model.train(data=f"data/{dataset_name}.yaml",epochs=retrain_epoch,imgsz=640,batch=batch_size,device=[1],
+results = model.train(data=f"data/{dataset_name}.yaml",epochs=retrain_epoch,imgsz=640,batch=batch_size,device=[0],
                       save_period=-1,
                       amp=False,
                       project=str(output_dir.parent),
