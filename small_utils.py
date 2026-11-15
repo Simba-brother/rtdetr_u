@@ -1,6 +1,8 @@
 
 import os
 import shutil
+import yaml
+
 exp_data_root = "/data/mml/data_debugging_data/ProAFL_data"
 
 def get_cost_time(cost_timetamp)->str:
@@ -34,3 +36,8 @@ def label_replace(dataset_name,train_labels_dir,val_labels_dir):
         if os.path.exists(cache_path):
             os.remove(cache_path)
             print(f"已删除标签缓存: {cache_path}")
+
+def read_yaml(yaml_path):
+    with open(yaml_path, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+    return config
