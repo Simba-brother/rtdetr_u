@@ -1,9 +1,12 @@
 
+import os
 from ultralytics import RTDETR
-from small_utils import label_replace
+from small_utils import label_replace,read_yaml
 from pathlib import Path
 
-exp_data_root = Path("/data/mml/data_debugging_data/ProAFL_data")
+print("PID:",os.getpid())
+config = read_yaml("config.yaml")
+exp_data_root = Path(config["exp_data_dir"])
 
 dataset_name = "kitti" # voc|kitti|visdrone
 inject_ratio = 0.1

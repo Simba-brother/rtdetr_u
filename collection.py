@@ -2,7 +2,7 @@ import os
 import json
 import time
 from ultralytics import RTDETR
-from small_utils import get_cost_time
+from small_utils import get_cost_time,read_yaml
 
 def collect_one_epoch(model:RTDETR,imgs_dir):
     results = model.predict(imgs_dir, stream=True, batch=256, conf=NMS_confi, device=f"cuda:{gpu_id}",verbose=False) # visdrone:conf=0.1,voc/kitti:conf=0.25(default)
@@ -44,7 +44,6 @@ def main():
     # 所有的训练集图片路径
     for epoch in range(Epochs):
         print(f"Epoch:{epoch}/{Epochs}...")
-        e_start_timestamp = time.time()
         # 模型
         model = RTDETR(os.path.join(models_dir,f"epoch{epoch}.pt"))
         predicted_box_dict = collect_one_epoch(model,imgs_dir)
@@ -57,23 +56,28 @@ def main():
         with open(save_json_path, "w", encoding="utf-8") as f:
             json.dump(predicted_box_dict, f, indent=4)
         print(f"数据保存在:{save_json_path}")
-        e_end_timestamp = time.time()
-        e_cost_timestamp = e_end_timestamp - e_start_timestamp
-        e_cost_time = get_cost_time(e_cost_timestamp)
-        print(f"该轮次耗时:{e_cost_time}")
 
 if __name__ == "__main__":
-    exp_data_root = "/data/mml/data_debugging_data/ProAFL_data"
-    dataset_name = "kitti" # voc|visdrone|kitti
+    print("PID:",os.getpid())
+    # ts = int(time.time()) # 时间戳
+    config = read_yaml("config.yaml")
+    exp_data_root = config["exp_data_dir"]
     model_name = "rtdetr"
-    ts = int(time.time()) # 时间戳
-    repeat_id = 1
     fault_rate = 0.1
     gpu_id = 0
-    Epochs = 100
-    NMS_confi = 0.25 # visdrone:0.1
-    imgs_dir = f"{exp_data_root}/datasets/{dataset_name}-yolo/origin/train/images"
-    collect_p_box_dir = os.path.join(exp_data_root,"collection_process_info",dataset_name,model_name,"collected_predict_boxes",
-        f"inject_{fault_rate}_repeat", f"repeat_{repeat_id}_{ts}")
-    models_dir = f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/fault_train/{fault_rate}/repeat_{repeat_id}/weights"
-    main()
+    Epochs = 50
+    for dataset_name in ["voc","kitti","visdrone"]:
+        dataset_start_time = time.time()
+        if dataset_name == "visdrone":
+            NMS_confi = 0.1 
+        elif dataset_name in ["voc","kitti"]:
+            NMS_confi = 0.25
+        for repeat_id in range(1,11):
+            repeat_start_time = time.time()
+            imgs_dir = f"{exp_data_root}/datasets/{dataset_name}-yolo/origin/train/images"
+            collect_p_box_dir = os.path.join(exp_data_root,"collection_process_info",dataset_name,model_name,"collected_predict_boxes",
+                f"inject_{fault_rate}_repeat", f"repeat_{repeat_id}")
+            models_dir = f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/fault_train/{fault_rate}/repeat_{repeat_id}/weights"
+            main()
+            print(f"dataset_name:{dataset_name}|repeat:{repeat_id}|cost_time:{get_cost_time(time.time() - repeat_start_time)}")
+        print(f"dataset_name:{dataset_name}|avg_cost_time:{get_cost_time((time.time() - dataset_start_time)/10)}")
