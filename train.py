@@ -1,7 +1,9 @@
 
 import os
+import time
 from ultralytics import RTDETR
 from small_utils import label_replace,read_yaml
+from small_utils import get_cost_time
 
 
 def main():    
@@ -23,5 +25,11 @@ if __name__ == "__main__":
     inject_ratio = 0.1
     gpu_ids = [0]
     for dataset_name in ["voc","kitti","visdrone"]:
-        for repeat_id in range(1,11):
+        dataset_start_time = time.time()
+        for repeat_id in range(2,11):
+            repeat_start_time = time.time()
             main()
+            print(f"datasetname:{dataset_name}|repeat:{repeat_id}|costTime:{get_cost_time(time.time()-repeat_start_time)}") 
+        avg_timestamp = (time.time()-dataset_start_time) / 10
+        print(f"datasetname:{dataset_name}|avgTime:{get_cost_time(avg_timestamp)}")
+            
