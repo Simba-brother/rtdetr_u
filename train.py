@@ -24,12 +24,13 @@ if __name__ == "__main__":
     exp_data_root = config["exp_data_dir"]
     inject_ratio = 0.1
     gpu_ids = [0]
-    for dataset_name in ["voc","kitti","visdrone"]:
+    for dataset_name in ["visdrone"]: # ["voc","kitti","visdrone"]:
         dataset_start_time = time.time()
-        for repeat_id in range(2,11):
+        repeat_ids = list(range(4,11))
+        for repeat_id in repeat_ids:
             repeat_start_time = time.time()
             main()
             print(f"datasetname:{dataset_name}|repeat:{repeat_id}|costTime:{get_cost_time(time.time()-repeat_start_time)}") 
-        avg_timestamp = (time.time()-dataset_start_time) / 10
-        print(f"datasetname:{dataset_name}|avgTime:{get_cost_time(avg_timestamp)}")
+        avg_timestamp = (time.time()-dataset_start_time) / len(repeat_ids)
+        print(f"datasetname:{dataset_name}|重复{len(repeat_ids)}次平均耗时:{get_cost_time(avg_timestamp)}")
             
