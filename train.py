@@ -11,7 +11,7 @@ def main():
     train_labels_dir = f"{exp_data_root}/fault_inject/{inject_ratio}/{dataset_name}/yolo_format/labels_train"
     val_labels_dir = f"{exp_data_root}/fault_inject/{inject_ratio}/{dataset_name}/yolo_format/labels_val"
     label_replace(dataset_name,train_labels_dir,val_labels_dir)
-    results = model.train(data=f"data/{dataset_name}.yaml",epochs=50,imgsz=640,batch=64,device=gpu_ids,
+    results = model.train(data=f"data/{dataset_name}.yaml",epochs=50,imgsz=640,batch=32,device=gpu_ids,workers=8,
                         save_period = 1,
                         amp=False,
                         project=f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/fault_train/{inject_ratio}",
@@ -23,10 +23,10 @@ if __name__ == "__main__":
     config = read_yaml("config.yaml")
     exp_data_root = config["exp_data_dir"]
     inject_ratio = 0.1
-    gpu_ids = [0]
+    gpu_ids = [1]
     for dataset_name in ["visdrone"]: # ["voc","kitti","visdrone"]:
         dataset_start_time = time.time()
-        repeat_ids = list(range(4,11))
+        repeat_ids = list(range(6,11))
         for repeat_id in repeat_ids:
             repeat_start_time = time.time()
             main()
