@@ -4,6 +4,9 @@ import time
 from ultralytics import RTDETR
 from small_utils import get_cost_time,read_yaml
 
+# from ultralytics.nn.modules.head
+# from ultralytics.models.rtdetr.predict
+
 def collect_one_epoch(model:RTDETR,imgs_dir):
     results = model.predict(imgs_dir, stream=True, batch=256, conf=NMS_confi, device=f"cuda:{gpu_id}",verbose=False) # visdrone:conf=0.1,voc/kitti:conf=0.25(default)
     predicted_box_dict = {}
@@ -64,7 +67,7 @@ if __name__ == "__main__":
     exp_data_root = config["exp_data_dir"]
     model_name = "rtdetr"
     fault_rate = 0.1
-    gpu_id = 0
+    gpu_id = 1
     Epochs = 50
     for dataset_name in ["voc","kitti","visdrone"]:
         dataset_start_time = time.time()
@@ -72,7 +75,8 @@ if __name__ == "__main__":
             NMS_confi = 0.1 
         elif dataset_name in ["voc","kitti"]:
             NMS_confi = 0.25
-        for repeat_id in range(1,11):
+        repeat_ids = list(range(2,11))
+        for repeat_id in repeat_ids:
             repeat_start_time = time.time()
             imgs_dir = f"{exp_data_root}/datasets/{dataset_name}-yolo/origin/train/images"
             collect_p_box_dir = os.path.join(exp_data_root,"collection_process_info",dataset_name,model_name,"collected_predict_boxes",
@@ -80,4 +84,4 @@ if __name__ == "__main__":
             models_dir = f"{exp_data_root}/models/{dataset_name.lower()}/rtdetr/fault_train/{fault_rate}/repeat_{repeat_id}/weights"
             main()
             print(f"dataset_name:{dataset_name}|repeat:{repeat_id}|cost_time:{get_cost_time(time.time() - repeat_start_time)}")
-        print(f"dataset_name:{dataset_name}|avg_cost_time:{get_cost_time((time.time() - dataset_start_time)/10)}")
+        print(f"dataset_name:{dataset_name}|重复次数{len(repeat_ids)}平均时间:{get_cost_time((time.time() - dataset_start_time)/len(repeat_ids))}")
